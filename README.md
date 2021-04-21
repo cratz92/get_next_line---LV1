@@ -6,6 +6,11 @@ ending with a newline, read from a file descriptor.
 # Introduction
 
 
+We are allowed to use the following functions:
+* read
+* malloc
+* free
+
 
 ### Main function prototype
 

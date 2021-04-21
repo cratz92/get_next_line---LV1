@@ -7,9 +7,9 @@ ending with a newline, read from a file descriptor.
 
 
 We are allowed to use the following functions:
-* read
-* malloc
-* free
+* read()
+* malloc()
+* free()
 
 
 ### Main function prototype
@@ -42,4 +42,14 @@ gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c get_next_line_utils.
 * get_next_line_utils.c
 * get_next_line.h
 
+# External functions prototypes
+
+ssize_t read(int fd, void *buf, size_t n_bytes) 
+~ ex. char *buffer; read(fd, buffer, 20); --> read 20 bytes or 20 chars
+
+void  *malloc(size_t size) 
+~ ex. buffer = malloc((20 + 1) * sizeof(char));
+
+void free(void *ptr)
+~ ex. free(buffer);
 

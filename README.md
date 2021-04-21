@@ -26,7 +26,7 @@ int get_next_line(int fd, char **line)
 gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c get_next_line_utils.c
 ```
 
-BUFFER_SIZE should be defined by the evaluator
+**BUFFER_SIZE** should be defined by the evaluator
 
 
 # Mandatory Part

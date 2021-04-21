@@ -5,9 +5,28 @@ ending with a newline, read from a file descriptor.
 
 # Introduction
 
+
+
+### Main function prototype
+
 ```c
 int get_next_line(int fd, char **line)
 
 ```
+### Return value
 
-# 
+* 1  --> line has been read
+* 0  --> reach EOF (end of file)
+* -1 --> error found
+
+
+
+# Mandatory Part
+
+### Files that need to be submitted:
+
+* get_next_line.c
+* get_next_line_utils.c
+* get_next_line.h
+
+

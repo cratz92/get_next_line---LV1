@@ -20,6 +20,14 @@ int get_next_line(int fd, char **line)
 * -1 --> error found
 
 
+### Compilation formula
+
+```c
+gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c get_next_line_utils.c
+```
+
+BUFFER_SIZE should be defined by the evaluator
+
 
 # Mandatory Part
 

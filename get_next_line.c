@@ -6,132 +6,107 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/04/21 13:53:31 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/04/22 07:03:13 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int get_next_line(int fd, char **line)
+static size_t	ft_write(t_buffer *buff_, char *readText, char **line)
 {
-  ssize_t readstat;
-  static char *store;
-  char  *tmpstore;
-  int storesize;
-  int nlcheck;
+	char	*tmp;
+	size_t	i;
 
-  storesize = 0;
-  tmpstore = malloc((BUFFER_SIZE + 1) * sizeof(char));
-  if (!tmpstore)
-    return (-1);
-  
-  readstat = read(fd, tmpstore, BUFFER_SIZE);
-  if (!readstat || readstat == 0 || fd == 0 || BUFFER_SIZE <= 0)
-    return (-1);
-  
-  storesize += readstat;
-  store = ft_update_str(store, tmpstore);
-  
-  while (readstat != 0)
-  {
-    store = ft_update_str(store, tmpstore);
-    nlcheck = ft_check_endline(store);
-    if (nlcheck != 0)
-      break ;
-
-    readstat = read(fd, tmpstore, BUFFER_SIZE);
-    if (!readstat)
-      return (-1);
-    
-    storesize += readstat;
-
-    
-
-    
-  }
+	i = 0;
+	tmp = ft_strdup(readText);
+	tmp[buff_->save_pos] = '\0';
+	if (tmp[0] == '\0')
+		*line = ft_strdup("");
+	else
+		*line = ft_strdup(tmp);
+	while (readText[i])
+		i++;
+	free(tmp);
+	return (i);
 }
 
-char  *ft_get_line_update(char **line, char *src, int i)
+static size_t	ft_get_elememt(t_buffer *buff_, char *readText)
 {
-  if (!(*line))
-    free(line);
-  line = malloc(sizeof())
+	buff_->save_pos = 0;
+	if (readText[0] == '\0')
+	{
+		buff_->flag_ = false;
+		return (0);
+	}
+	while (readText[buff_->save_pos])
+	{
+		if (readText[buff_->save_pos] == '\n')
+		{
+			buff_->flag_ = true;
+			break ;
+		}
+		buff_->save_pos++;
+		buff_->flag_ = false;
+	}
+	return (buff_->save_pos);
 }
 
-int ft_check_endline(char *str)
+static char	*ft_get_remaining_text(t_buffer *buff_, char *readText, char **line)
 {
-  int i;
+	char	*tmp;
+	int		size;
 
-  if (!str)
-    return (0);
-  while (str[i] != '\0')
-  {
-    if (str[i] == '\n')
-      return (i);
-    i++;
-  }
-  return (0);
+	buff_->save_pos = ft_get_elememt(buff_, readText);
+	size = ft_write(buff_, readText, line);
+	if (readText[buff_->save_pos] == '\0')
+	{
+		free(readText);
+		readText = NULL;
+		return (readText);
+	}
+	free(readText);
+	tmp = ft_substr(readText, buff_->save_pos + 1, size - (buff_->save_pos) - 1);
+	free(buff_->buf);
+	buff_->buf = 0;
+	return (tmp);
 }
 
-
-char  *ft_update_str(char *dest, char *src)
+static char	*ft_update_readtext(t_buffer *buff_, char *readText)
 {
-  int Destsize;
-  int i;
-  char *tmp;
+	char	*tmp;
 
-  if (!dest || !src)
-    return (0);
-  tmp = malloc(sizeof(char) * (ft_strlen(dest) + ft_strlen(src) + 1));
-  if (!tmp)
-    return (0);
-  Destsize = ft_strlen(dest);
-  i = 0;
-  while (src[i] != '\0')
-  {
-    dest[ Destsize + i] = src[i];
-    i++;
-  }
-  dest[Destsize + i];
-  return (dest);
+	buff_->buf[buff_->r] = '\0';
+	if (!readText)
+		readText = ft_strdup(buff_->buf);
+		
+	else
+	{
+		tmp = ft_strjoin(readText, buff_->buf);
+		free(readText);
+		return (tmp);
+	}
+	return (readText);
 }
 
-
-int ft_strlen(char *str)
+int	get_next_line(int fd, char **line)
 {
-  int i;
+	t_buffer	buff_;
+	static char	*readText;
 
-  i = 0;
-  if (!str)
-    return (0);
-  while (*str)
-  {
-    i++;
-    str++;
-  }
-  return (i);
+	buff_.buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (fd < 0 || !line || BUFFER_SIZE <= 0 || read(fd, 0, 0) == -1
+		|| fd == 1 || fd == 2 || !buff_.buf)
+		return (-1);
+	buff_.r = read(fd, buff_.buf, BUFFER_SIZE);
+	readText[fd] = ft_update_readtext(&buff_, readText[fd]);
+	while (!ft_strchr(buff_.buf, '\n') && buff_.r)
+	{
+		buff_.r = read(fd, buff_.buf, BUFFER_SIZE);
+		readText[fd] = ft_update_readtext(&buff_, readText[fd]);
+	}
+	readText[fd] = ft_get_remaining_text(&buff_, readText[fd], line);
+	if (buff_.flag_)
+		return (1);
+	else
+		return (0);
 }
-
-
-/*
-
-ssize_t read(int fd, void *buf, size_t nbyte)
----> attempts to read nbyte bytes of data from obj referenced by the fd into the buffer pointed to by buf.
-return, number of bytes actually read is returned. upon EOF, returns 0. otherwise, returns -1 indicating an error.
-
-BUFFER_SIZE from compilation 
-
-FILE *fopen(const char *restrict name, const char *restrict mode)
-
-modes: "w" - write ops, current contents are discarded / "a" - append ops, write at EOF
-        "r" - read ops
-        "w+" / "a+" / "r+"
-
-fclose( *file pointer ) 
-
-file positioning
-
---|-> finding out where you are in a file
-  |-> moving to a given point in a file
-
-*/

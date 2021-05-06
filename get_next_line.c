@@ -6,7 +6,7 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/04/22 07:03:13 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/04/29 02:50:32 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,83 +30,46 @@ static size_t	ft_write(t_buffer *buff_, char *readText, char **line)
 	return (i);
 }
 
-static size_t	ft_get_elememt(t_buffer *buff_, char *readText)
-{
-	buff_->save_pos = 0;
-	if (readText[0] == '\0')
-	{
-		buff_->flag_ = false;
-		return (0);
-	}
-	while (readText[buff_->save_pos])
-	{
-		if (readText[buff_->save_pos] == '\n')
-		{
-			buff_->flag_ = true;
-			break ;
-		}
-		buff_->save_pos++;
-		buff_->flag_ = false;
-	}
-	return (buff_->save_pos);
-}
-
-static char	*ft_get_remaining_text(t_buffer *buff_, char *readText, char **line)
-{
-	char	*tmp;
-	int		size;
-
-	buff_->save_pos = ft_get_elememt(buff_, readText);
-	size = ft_write(buff_, readText, line);
-	if (readText[buff_->save_pos] == '\0')
-	{
-		free(readText);
-		readText = NULL;
-		return (readText);
-	}
-	free(readText);
-	tmp = ft_substr(readText, buff_->save_pos + 1, size - (buff_->save_pos) - 1);
-	free(buff_->buf);
-	buff_->buf = 0;
-	return (tmp);
-}
-
 static char	*ft_update_readtext(t_buffer *buff_, char *readText)
 {
 	char	*tmp;
 
-	buff_->buf[buff_->r] = '\0';
 	if (!readText)
+	buff_->buf[buff_->nbr_chrs] = '\0';
+	tmp = readText;
+	if (readText[0] == 0)
 		readText = ft_strdup(buff_->buf);
-		
 	else
 	{
-		tmp = ft_strjoin(readText, buff_->buf);
 		free(readText);
-		return (tmp);
+		readText = ft_strjoin(buff_->buf, tmp);
+		free(tmp);
 	}
 	return (readText);
+
+}
+
+static char	*ft_get_remaining_text(t_buffer *buff_, char *readText, char **line)
+{
+
 }
 
 int	get_next_line(int fd, char **line)
 {
 	t_buffer	buff_;
-	static char	*readText;
+	static char	*readText[MAX_SIZE];
 
-	buff_.buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (fd < 0 || !line || BUFFER_SIZE <= 0 || read(fd, 0, 0) == -1
-		|| fd == 1 || fd == 2 || !buff_.buf)
+		|| fd == 1 || fd == 2)
 		return (-1);
-	buff_.r = read(fd, buff_.buf, BUFFER_SIZE);
-	readText[fd] = ft_update_readtext(&buff_, readText[fd]);
-	while (!ft_strchr(buff_.buf, '\n') && buff_.r)
+	buff_.nbr_chrs = 1;
+	while (buff_.nbr_chrs && !ft_strchr(readText[fd], '\n'))
 	{
-		buff_.r = read(fd, buff_.buf, BUFFER_SIZE);
+		buff_.buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+		if (!buff_.buf)
+			return (-1);
+		buff_.nbr_chrs = read(fd, buff_.buf, BUFFER_SIZE);
 		readText[fd] = ft_update_readtext(&buff_, readText[fd]);
 	}
 	readText[fd] = ft_get_remaining_text(&buff_, readText[fd], line);
-	if (buff_.flag_)
-		return (1);
-	else
-		return (0);
 }

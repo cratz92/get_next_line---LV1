@@ -6,7 +6,7 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:17:54 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/04/22 07:03:05 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/04/28 04:25:59 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <limits.h>
 
 # define MAX_SIZE 4096
+# define BUFFER_SIZE 5
 
 typedef struct s_buffer
 {
@@ -29,6 +30,7 @@ typedef struct s_buffer
 	ssize_t		r;
 	size_t		save_pos;
 	bool		flag_;
+	int			nbr_chrs;
 
 }				t_buffer;
 

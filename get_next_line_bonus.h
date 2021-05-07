@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:17:54 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/07 03:16:58 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/05/07 03:17:34 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -20,6 +20,10 @@
 # include <stdbool.h>
 # include <string.h>
 # include <limits.h>
+
+# ifndef MAX_VALUE
+#  define MAX_VALUE 4096
+# endif
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 5

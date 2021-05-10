@@ -42,7 +42,19 @@ gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c get_next_line_utils.
 * get_next_line_utils.c
 * get_next_line.h
 
+### Files that need to be submitted for the bonus:
+
+* get_next_line_bonus.c
+* get_next_line_utils_bonus.c
+* get_next_line_bonus.h
+* 
 # External functions prototypes
+
+Since we can't use the libft on this project, I had to include the following functions inside the utils file.
+
+##### ft_strchr, ft_strlen, ft_strdup, ft_strjoin and ft_substr 
+
+Each of these can be found inside Libft project.
 
 ssize_t read(int fd, void *buf, size_t n_bytes) 
 ~ ex. char *buffer; read(fd, buffer, 20); --> read 20 bytes or 20 chars

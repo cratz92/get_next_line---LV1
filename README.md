@@ -48,7 +48,8 @@ gcc -Wall -Wextra -Werror -D BUFFER_SIZE=xx get_next_line.c get_next_line_utils.
 * get_next_line_bonus.c
 * get_next_line_utils_bonus.c
 * get_next_line_bonus.h
-* 
+
+
 # External functions 
 
 Since we can't use the libft on this project, I had to include the following functions inside the utils file.

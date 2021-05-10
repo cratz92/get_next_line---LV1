@@ -6,7 +6,7 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:17:54 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/07 03:16:58 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/05/10 03:58:10 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,28 @@
 #  define BUFFER_SIZE 5
 # endif
 
+# ifndef MAX_SIZE
+#  define MAX_SIZE 4096
+# endif
+
 typedef struct s_buffer
 {
-	int		size;
-	char	content[BUFFER_SIZE + 1];
+	int		r;
+	char	*content;
+	bool	is_reading;
+	int		save_pos;
 }			t_buffer;
 
+// MAIN FILE
+
 int			get_next_line(int fd, char **line);
-char		*join_and_realloc(char *str, char *buf, int size);
-int			find_char_index(char *str, char c);
+
+// EXTRA FILE
+
+char		*ft_strdup(const char *s);
+char		*ft_strjoin(char const *s1, char const *s2);
+char		*ft_substr(char const *s, unsigned int start, size_t len);
+char		*ft_strchr(const char *s, int c);
+size_t		ft_strlen(const char *s);
 
 #endif

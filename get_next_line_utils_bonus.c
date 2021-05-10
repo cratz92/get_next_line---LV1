@@ -6,13 +6,13 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:22:02 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/07 03:15:23 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/05/10 04:04:40 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
-static int	ft_strlen(const char *s)
+size_t	ft_strlen(const char *s)
 {
 	size_t	i;
 
@@ -25,60 +25,94 @@ static int	ft_strlen(const char *s)
 	return (i);
 }
 
-static char	*ft_realloc(char *str, int size)
+char	*ft_strchr(const char *s, int c)
 {
-	char	*new;
-	int		i;
+	char	*ptr;
 
-	if (size < ft_strlen(str))
-		return (NULL);
-	new = malloc(size * sizeof(char));
-	if (!new)
-		return (NULL);
-	i = 0;
-	while (str[i] && i < size)
+	ptr = (char *)s;
+	while (*ptr != (unsigned char)c)
 	{
-		new[i] = str[i];
-		i++;
+		if (*ptr == '\0')
+			return (0);
+		ptr++;
 	}
-	new[i] = '\0';
-	free(str);
-	return (new);
+	return (ptr);
 }
 
-char	*join_and_realloc(char *str, char *buf, int size)
+char	*ft_strdup(const char *s)
 {
-	int	i;
-	int	j;
-	int	n;
+	char	*str;
+	int		i;
 
-	n = ft_strlen(str);
-	j = n + size + 1;
-	str = ft_realloc(str, j);
+	i = 0;
+	while (s[i])
+		i++;
+	str = malloc((i + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	i = 0;
-	j = n;
-	while (i < size)
+	while (s[i])
 	{
-		str[j] = buf[i];
+		str[i] = s[i];
 		i++;
-		j++;
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t		i;
+	size_t		j;
+	char		*str;
+
+	if (!s1 || !s2)
+		return (0);
+	str = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
+	if (!str)
+		return (0);
+	i = 0;
+	j = 0;
+	while (s1[i])
+	{
+		str[j++] = s1[i];
+		i++;
+	}
+	i = 0;
+	while (s2[i])
+	{
+		str[j++] = s2[i];
+		i++;
 	}
 	str[j] = '\0';
 	return (str);
 }
 
-int	find_char_index(char *str, char c)
+char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	int	i;
+	char			*str;
+	unsigned int	i;
+	unsigned int	size;
 
 	i = 0;
-	while (str[i])
+	if (!s)
+		return (0);
+	size = ft_strlen(s);
+	if (size <= start)
+		size = 0;
+	if (size > len)
+		size = len;
+	str = malloc((size + 1) * sizeof(char));
+	if (!str)
+		return (0);
+	if (size != 0)
 	{
-		if (str[i] == c)
-			return (i);
-		i++;
+		while (len-- && s[start + i] != 0)
+		{
+			str[i] = s[start + i];
+			i++;
+		}
 	}
-	return (-1);
+	str[i] = '\0';
+	return (str);
 }

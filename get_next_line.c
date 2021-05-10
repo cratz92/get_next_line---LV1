@@ -6,13 +6,23 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/07 01:26:55 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/05/10 03:58:14 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int	check_errors(int fd, char **line, int size, int is_start)
+static int	ft_get_index(char **save)
+{
+	int	i;
+
+	i = 0;
+	while ((*save)[i] != '\n' && (*save)[i] != '\0')
+		i++;
+	return (i);
+}
+
+static int	ft_check_errors(int fd, char **line, int nb, int is_start)
 {
 	if (BUFFER_SIZE <= 0)
 		return (0);
@@ -20,7 +30,7 @@ static int	check_errors(int fd, char **line, int size, int is_start)
 		*line = malloc(sizeof(char));
 	if (!(*line))
 		return (0);
-	if (size < 0 || fd < 0)
+	if (fd < 0 || nb < 0)
 	{
 		free(*line);
 		*line = 0;
@@ -31,56 +41,66 @@ static int	check_errors(int fd, char **line, int size, int is_start)
 	return (1);
 }
 
-static int	maj_buffer(char *buf, int i)
+static int	ft_read_input(int fd, t_buffer *buff, char **save)
 {
-	int	j;
+	char	*tmp;
 
-	j = 0;
-	while (j < BUFFER_SIZE - i)
+	buff->is_reading = true;
+	while (buff->is_reading)
 	{
-		buf[j] = buf[i + 1 + j];
-		j++;
+		buff->r = read(fd, buff->content, BUFFER_SIZE);
+		buff->content[buff->r] = '\0';
+		if (!(save[fd]))
+			save[fd] = ft_strdup(buff->content);
+		else
+		{
+			tmp = ft_strjoin(save[fd], buff->content);
+			free(save[fd]);
+			save[fd] = ft_strdup(tmp);
+		}
+		if (ft_strchr(save[fd], '\n') || (buff->r <= 0))
+			buff->is_reading = false;
 	}
-	i = j;
-	while (j <= BUFFER_SIZE)
-	{
-		buf[j] = '\0';
-		j++;
-	}
-	return (i);
+	free(buff->content);
+	return (buff->r);
 }
 
-static int	index_pos(int size)
+static int	ft_update_save(t_buffer *buff, char **save, char **line)
 {
-	if (size < 0)
+	char	*tmp;
+
+	if (!strchr(*save, '\n'))
+	{
+		*line = ft_strdup(*save);
+		free(*save);
+		*save = 0;
 		return (0);
-	return (size);
+	}
+	else
+	{
+		buff->save_pos = ft_get_index(save);
+		*line = ft_substr(*save, 0, buff->save_pos);
+		tmp = ft_strdup(ft_strchr(*save, '\n') + 1);
+		free(*save);
+		*save = ft_strdup(tmp);
+		return (1);
+	}
 }
+
 
 int	get_next_line(int fd, char **line)
 {
-	static t_buffer	buff;
-	int				i;
+	static char	*save[MAX_SIZE];
+	t_buffer	buff;
 
-	if (!line || !check_errors(fd, line, 1, 1))
+	if (!line || !ft_check_errors(fd, line, 1, 1))
 		return (-1);
-	if (buff.size <= 0)
-	{
-		buff.size = read(fd, buff.content, BUFFER_SIZE);
-		buff.content[index_pos(buff.size)] = '\0';
-	}
-	while (buff.size > 0)
-	{
-		i = find_char_index(buff.content, '\n');
-		if (i >= 0)
-		{
-			*line = join_and_realloc(*line, buff.content, i);
-			buff.size = maj_buffer(buff.content, i);
-			return (check_errors(fd, line, 1, 0));
-		}
-		*line = join_and_realloc(*line, buff.content, BUFFER_SIZE + 1);
-		buff.size = read(fd, buff.content, BUFFER_SIZE);
-		buff.content[index_pos(buff.size)] = '\0';
-	}
-	return (check_errors(fd, line, buff.size, 0) - 1);
+	buff.content = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buff.content)
+		return (-1);
+	buff.r = ft_read_input(fd, &buff, save);
+	if ((buff.r < 0) || (buff.r == 0 && save[fd] == 0))
+		return (ft_check_errors(fd, line, buff.r, 0) - 1);
+	else
+		return (ft_update_save(&buff, &save[fd], line));
 }

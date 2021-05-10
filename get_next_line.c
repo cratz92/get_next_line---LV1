@@ -6,7 +6,7 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/10 03:58:14 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/05/10 05:04:34 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,24 @@ static int	ft_get_index(char **save)
 {
 	int	i;
 
-	i = 0;
-	while ((*save)[i] != '\n' && (*save)[i] != '\0')
-		i++;
+	i = ft_strchr(*save, '\n') - *save;
 	return (i);
 }
 
-static int	ft_check_errors(int fd, char **line, int nb, int is_start)
+static int	ft_check_errors(int fd, char **line, int n, int is_start)
 {
 	if (BUFFER_SIZE <= 0)
+		return (0);
+	if (read(fd, NULL, 0) == -1)
 		return (0);
 	if (is_start)
 		*line = malloc(sizeof(char));
 	if (!(*line))
 		return (0);
-	if (fd < 0 || nb < 0)
+	if (fd < 0 || n < 0 || fd == 1 || fd == 2)
 	{
 		free(*line);
-		*line = 0;
+		*line = NULL;
 		return (0);
 	}
 	if (is_start)
@@ -73,20 +73,19 @@ static int	ft_update_save(t_buffer *buff, char **save, char **line)
 	{
 		*line = ft_strdup(*save);
 		free(*save);
-		*save = 0;
+		*save = NULL;
 		return (0);
 	}
 	else
 	{
 		buff->save_pos = ft_get_index(save);
 		*line = ft_substr(*save, 0, buff->save_pos);
-		tmp = ft_strdup(ft_strchr(*save, '\n') + 1);
+		tmp = ft_substr(*save, (buff->save_pos + 1), ft_strlen(*save));
 		free(*save);
 		*save = ft_strdup(tmp);
 		return (1);
 	}
 }
-
 
 int	get_next_line(int fd, char **line)
 {
@@ -95,11 +94,11 @@ int	get_next_line(int fd, char **line)
 
 	if (!line || !ft_check_errors(fd, line, 1, 1))
 		return (-1);
-	buff.content = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	buff.content = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buff.content)
 		return (-1);
 	buff.r = ft_read_input(fd, &buff, save);
-	if ((buff.r < 0) || (buff.r == 0 && save[fd] == 0))
+	if ((buff.r < 0) || (buff.r == 0 && save[fd] == NULL))
 		return (ft_check_errors(fd, line, buff.r, 0) - 1);
 	else
 		return (ft_update_save(&buff, &save[fd], line));

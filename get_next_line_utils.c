@@ -6,113 +6,70 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:22:02 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/10 04:03:14 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/14 21:35:51 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
+void	ft_fill(char *dst, const char *src, char lim)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
-	while (*s)
+	while (src[i] && src[i] != lim)
 	{
-		s++;
+		dst[i] = src[i];
 		i++;
 	}
-	return (i);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	char	*ptr;
-
-	ptr = (char *)s;
-	while (*ptr != (unsigned char)c)
+	if (lim == '\n')
 	{
-		if (*ptr == '\0')
-			return (0);
-		ptr++;
+		dst[i] = '\n';
+		dst[i + 1] = '\0';
 	}
-	return (ptr);
+	else
+		dst[i] = '\0';
 }
 
-char	*ft_strdup(const char *s)
+int	ft_concat(char **line, char *buf, char lim)
 {
-	char	*str;
+	char	*new_line;
+	int		len_line;
+	int		len_buf;
+
+	len_line = 0;
+	len_buf = 0;
+	if (*line)
+		while ((*line)[len_line])
+			len_line++;
+	while (buf[len_buf] && buf[len_buf] != lim)
+		len_buf++;
+	new_line = malloc(sizeof(char) * (len_line + len_buf + 1));
+	if (!new_line)
+	{
+		free(*line);
+		*line = NULL;
+		return (RETURN_LINE);
+	}
+	if (*line)
+		ft_fill(new_line, *line, lim);
+	ft_fill(&new_line[len_line], buf, lim);
+	free(*line);
+	*line = new_line;
+	return (CONCAT_DONE);
+}
+
+char	*ft_update_save(char *save)
+{
+	char	*tmp;
 	int		i;
 
 	i = 0;
-	while (s[i])
+	while (save[i])
 		i++;
-	str = malloc((i + 1) * sizeof(char));
-	if (!str)
+	tmp = malloc(sizeof(char) * (i + 1));
+	if (!tmp)
 		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t		i;
-	size_t		j;
-	char		*str;
-
-	if (!s1 || !s2)
-		return (0);
-	str = (char *)malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (!str)
-		return (0);
-	i = 0;
-	j = 0;
-	while (s1[i])
-	{
-		str[j++] = s1[i];
-		i++;
-	}
-	i = 0;
-	while (s2[i])
-	{
-		str[j++] = s2[i];
-		i++;
-	}
-	str[j] = '\0';
-	return (str);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char			*str;
-	unsigned int	i;
-	unsigned int	size;
-
-	i = 0;
-	if (!s)
-		return (0);
-	size = ft_strlen(s);
-	if (size <= start)
-		size = 0;
-	if (size > len)
-		size = len;
-	str = malloc((size + 1) * sizeof(char));
-	if (!str)
-		return (0);
-	if (size != 0)
-	{
-		while (len-- && s[start + i] != 0)
-		{
-			str[i] = s[start + i];
-			i++;
-		}
-	}
-	str[i] = '\0';
-	return (str);
+	ft_fill(tmp, save, '\0');
+	return (tmp);
 }

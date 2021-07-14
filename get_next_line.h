@@ -6,12 +6,21 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:17:54 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/10 03:58:10 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/14 21:37:15 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 32
+# endif
+
+# define ERROR -1
+# define RETURN_LINE 0
+# define LINE_NOT_FULL 1
+# define CONCAT_DONE 1
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -21,32 +30,21 @@
 # include <string.h>
 # include <limits.h>
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 5
-# endif
+/*
+** get_next_line.c
+*/
 
-# ifndef MAX_SIZE
-#  define MAX_SIZE 4096
-# endif
+void	nl_save(char **line, char **save, int pos);
+int		ft_save(char **line, char **save);
+void	nl_buf(char **line, char *buf, char **save, int pos);
+int		ft_buf(char **line, char *buf, char **save);
+char	*get_next_line(int fd);
 
-typedef struct s_buffer
-{
-	int		r;
-	char	*content;
-	bool	is_reading;
-	int		save_pos;
-}			t_buffer;
-
-// MAIN FILE
-
-int			get_next_line(int fd, char **line);
-
-// EXTRA FILE
-
-char		*ft_strdup(const char *s);
-char		*ft_strjoin(char const *s1, char const *s2);
-char		*ft_substr(char const *s, unsigned int start, size_t len);
-char		*ft_strchr(const char *s, int c);
-size_t		ft_strlen(const char *s);
+/*
+** get_next_line_utils.c
+*/
+char	*ft_update_save(char *save);
+void	ft_fill(char *dst, const char *src, char lim);
+int		ft_concat(char **line, char *buf, char lim);
 
 #endif

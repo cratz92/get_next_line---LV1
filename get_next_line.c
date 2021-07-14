@@ -6,100 +6,116 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/05/10 05:04:34 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/14 21:36:04 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static int	ft_get_index(char **save)
+void	nl_save(char **line, char **save, int pos)
 {
-	int	i;
+	char	*new_save;
 
-	i = ft_strchr(*save, '\n') - *save;
-	return (i);
-}
-
-static int	ft_check_errors(int fd, char **line, int n, int is_start)
-{
-	if (BUFFER_SIZE <= 0)
-		return (0);
-	if (read(fd, NULL, 0) == -1)
-		return (0);
-	if (is_start)
-		*line = malloc(sizeof(char));
-	if (!(*line))
-		return (0);
-	if (fd < 0 || n < 0 || fd == 1 || fd == 2)
+	ft_fill(*line, *save, '\n');
+	if (!(*save)[pos + 1])
+	{
+		free(*save);
+		*save = NULL;
+		return ;
+	}
+	new_save = ft_update_save(&(*save)[pos + 1]);
+	free(*save);
+	*save = new_save;
+	if (!(*save))
 	{
 		free(*line);
 		*line = NULL;
-		return (0);
-	}
-	if (is_start)
-		(*line)[0] = '\0';
-	return (1);
-}
-
-static int	ft_read_input(int fd, t_buffer *buff, char **save)
-{
-	char	*tmp;
-
-	buff->is_reading = true;
-	while (buff->is_reading)
-	{
-		buff->r = read(fd, buff->content, BUFFER_SIZE);
-		buff->content[buff->r] = '\0';
-		if (!(save[fd]))
-			save[fd] = ft_strdup(buff->content);
-		else
-		{
-			tmp = ft_strjoin(save[fd], buff->content);
-			free(save[fd]);
-			save[fd] = ft_strdup(tmp);
-		}
-		if (ft_strchr(save[fd], '\n') || (buff->r <= 0))
-			buff->is_reading = false;
-	}
-	free(buff->content);
-	return (buff->r);
-}
-
-static int	ft_update_save(t_buffer *buff, char **save, char **line)
-{
-	char	*tmp;
-
-	if (!strchr(*save, '\n'))
-	{
-		*line = ft_strdup(*save);
-		free(*save);
-		*save = NULL;
-		return (0);
-	}
-	else
-	{
-		buff->save_pos = ft_get_index(save);
-		*line = ft_substr(*save, 0, buff->save_pos);
-		tmp = ft_substr(*save, (buff->save_pos + 1), ft_strlen(*save));
-		free(*save);
-		*save = ft_strdup(tmp);
-		return (1);
 	}
 }
 
-int	get_next_line(int fd, char **line)
+int	ft_save(char **line, char **save)
 {
-	static char	*save[MAX_SIZE];
-	t_buffer	buff;
+	int	i;
 
-	if (!line || !ft_check_errors(fd, line, 1, 1))
-		return (-1);
-	buff.content = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buff.content)
-		return (-1);
-	buff.r = ft_read_input(fd, &buff, save);
-	if ((buff.r < 0) || (buff.r == 0 && save[fd] == NULL))
-		return (ft_check_errors(fd, line, buff.r, 0) - 1);
-	else
-		return (ft_update_save(&buff, &save[fd], line));
+	i = 0;
+	if (!(*save))
+		return (LINE_NOT_FULL);
+	while ((*save)[i] && (*save)[i] != '\n')
+		i++;
+	if ((*save)[i] == '\n')
+	{
+		*line = malloc(sizeof(char) * (i + 2));
+		nl_save(line, save, i);
+		return (RETURN_LINE);
+	}
+	*line = malloc(sizeof(char) * (i + 1));
+	if (!line)
+		return (RETURN_LINE);
+	ft_fill(*line, *save, '\0');
+	free(*save);
+	*save = NULL;
+	return (LINE_NOT_FULL);
+}
+
+void	nl_buf(char **line, char *buf, char **save, int pos)
+{
+	int	i;
+
+	i = pos + 1;
+	if (!buf[i])
+		return ;
+	while (buf[i])
+		i++;
+	*save = malloc(sizeof(char) * (i + 1));
+	if (!(*save))
+	{
+		free(*line);
+		*line = NULL;
+		return ;
+	}
+	ft_fill(*save, &buf[pos + 1], '\0');
+}
+
+int	ft_buf(char **line, char *buf, char **save)
+{
+	int	i;
+
+	i = 0;
+	while (buf[i] && buf[i] != '\n')
+		i++;
+	if (ft_concat(line, buf, buf[i]) == RETURN_LINE)
+		return (RETURN_LINE);
+	if (buf[i] == '\n')
+	{
+		nl_buf(line, buf, save, i);
+		return (RETURN_LINE);
+	}
+	return (LINE_NOT_FULL);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*save = NULL;
+	char		*line;
+	char		buf[BUFFER_SIZE + 1];
+	int			ret;
+
+	line = NULL;
+	if (ft_save(&line, &save) == RETURN_LINE)
+		return (line);
+	ret = read(fd, buf, BUFFER_SIZE);
+	if (ret == ERROR)
+		return (NULL);
+	buf[ret] = '\0';
+	while (ret)
+	{
+		ret = ft_buf(&line, buf, &save);
+		if (ret == RETURN_LINE)
+			return (line);
+		ret = read(fd, buf, BUFFER_SIZE);
+		if (ret == ERROR)
+			return (NULL);
+		buf[ret] = '\0';
+	}
+	return (line);
 }

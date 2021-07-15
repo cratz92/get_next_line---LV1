@@ -16,14 +16,16 @@ Note:. The respective prototypes can be found at the bottom of this file.
 ### Main function prototype
 
 ```c
-int get_next_line(int fd, char **line)
+
+char *get_next_line(int fd) (newer version)
+
+int get_next_line(int fd, char **line) (older version)
 
 ```
 ### Return value
 
-* 1  --> line has been read
-* 0  --> reach EOF (end of file)
-* -1 --> error found
+* Read line --> correct behavior
+* NULL ---> nothing else to read or an error occurred
 
 
 ### Compilation formula

@@ -6,7 +6,7 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:17:54 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/07/14 21:37:15 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/15 16:32:32 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 32
+#  define BUFFER_SIZE 1
 # endif
 
 # define ERROR -1
 # define RETURN_LINE 0
 # define LINE_NOT_FULL 1
-# define CONCAT_DONE 1
+# define SUCESS_CONCAT 1
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -34,17 +34,17 @@
 ** get_next_line.c
 */
 
-void	nl_save(char **line, char **save, int pos);
-int		ft_save(char **line, char **save);
-void	nl_buf(char **line, char *buf, char **save, int pos);
-int		ft_buf(char **line, char *buf, char **save);
-char	*get_next_line(int fd);
+static void	extra_save(char **line, char **save, int pos);
+int			ft_check_save(char **line, char **save);
+static void	extra_buf(char **line, char *buf, char **save, int pos);
+int			ft_check_buf(char **line, char *buf, char **save);
+char		*get_next_line(int fd);
 
 /*
 ** get_next_line_utils.c
 */
-char	*ft_update_save(char *save);
-void	ft_fill(char *dst, const char *src, char lim);
-int		ft_concat(char **line, char *buf, char lim);
+char		*ft_update_save(char *save);
+void		ft_strcpy_gnl(char *dst, const char *src, char lim);
+int			ft_concat(char **line, char *buf, char lim);
 
 #endif

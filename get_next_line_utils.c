@@ -6,13 +6,13 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:22:02 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/07/14 21:35:51 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/15 16:30:47 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_fill(char *dst, const char *src, char lim)
+void	ft_strcpy_gnl(char *dst, const char *src, char lim)
 {
 	int	i;
 
@@ -52,11 +52,11 @@ int	ft_concat(char **line, char *buf, char lim)
 		return (RETURN_LINE);
 	}
 	if (*line)
-		ft_fill(new_line, *line, lim);
-	ft_fill(&new_line[len_line], buf, lim);
+		ft_strcpy_gnl(new_line, *line, lim);
+	ft_strcpy_gnl(&new_line[len_line], buf, lim);
 	free(*line);
 	*line = new_line;
-	return (CONCAT_DONE);
+	return (SUCESS_CONCAT);
 }
 
 char	*ft_update_save(char *save)
@@ -70,6 +70,6 @@ char	*ft_update_save(char *save)
 	tmp = malloc(sizeof(char) * (i + 1));
 	if (!tmp)
 		return (NULL);
-	ft_fill(tmp, save, '\0');
+	ft_strcpy_gnl(tmp, save, '\0');
 	return (tmp);
 }

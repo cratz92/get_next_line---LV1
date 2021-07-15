@@ -6,17 +6,17 @@
 /*   By: cbrito-l <cbrito-l@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 12:15:48 by cbrito-l          #+#    #+#             */
-/*   Updated: 2021/07/14 21:36:04 by cbrito-l         ###   ########.fr       */
+/*   Updated: 2021/07/15 16:32:24 by cbrito-l         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	nl_save(char **line, char **save, int pos)
+static void	extra_save(char **line, char **save, int pos)
 {
 	char	*new_save;
 
-	ft_fill(*line, *save, '\n');
+	ft_strcpy_gnl(*line, *save, '\n');
 	if (!(*save)[pos + 1])
 	{
 		free(*save);
@@ -33,7 +33,7 @@ void	nl_save(char **line, char **save, int pos)
 	}
 }
 
-int	ft_save(char **line, char **save)
+int	ft_check_save(char **line, char **save)
 {
 	int	i;
 
@@ -45,19 +45,19 @@ int	ft_save(char **line, char **save)
 	if ((*save)[i] == '\n')
 	{
 		*line = malloc(sizeof(char) * (i + 2));
-		nl_save(line, save, i);
+		extra_save(line, save, i);
 		return (RETURN_LINE);
 	}
 	*line = malloc(sizeof(char) * (i + 1));
 	if (!line)
 		return (RETURN_LINE);
-	ft_fill(*line, *save, '\0');
+	ft_strcpy_gnl(*line, *save, '\0');
 	free(*save);
 	*save = NULL;
 	return (LINE_NOT_FULL);
 }
 
-void	nl_buf(char **line, char *buf, char **save, int pos)
+static void	extra_buf(char **line, char *buf, char **save, int pos)
 {
 	int	i;
 
@@ -73,10 +73,10 @@ void	nl_buf(char **line, char *buf, char **save, int pos)
 		*line = NULL;
 		return ;
 	}
-	ft_fill(*save, &buf[pos + 1], '\0');
+	ft_strcpy_gnl(*save, &buf[pos + 1], '\0');
 }
 
-int	ft_buf(char **line, char *buf, char **save)
+int	ft_check_buf(char **line, char *buf, char **save)
 {
 	int	i;
 
@@ -87,7 +87,7 @@ int	ft_buf(char **line, char *buf, char **save)
 		return (RETURN_LINE);
 	if (buf[i] == '\n')
 	{
-		nl_buf(line, buf, save, i);
+		extra_buf(line, buf, save, i);
 		return (RETURN_LINE);
 	}
 	return (LINE_NOT_FULL);
@@ -101,7 +101,7 @@ char	*get_next_line(int fd)
 	int			ret;
 
 	line = NULL;
-	if (ft_save(&line, &save) == RETURN_LINE)
+	if (ft_check_save(&line, &save) == RETURN_LINE)
 		return (line);
 	ret = read(fd, buf, BUFFER_SIZE);
 	if (ret == ERROR)
@@ -109,7 +109,7 @@ char	*get_next_line(int fd)
 	buf[ret] = '\0';
 	while (ret)
 	{
-		ret = ft_buf(&line, buf, &save);
+		ret = ft_check_buf(&line, buf, &save);
 		if (ret == RETURN_LINE)
 			return (line);
 		ret = read(fd, buf, BUFFER_SIZE);
